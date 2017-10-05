@@ -11,6 +11,7 @@ MODULE_LICENSE("GPL");
 
 struct task_struct *t[THREAD_CNT];
 static int num[]={0,1,2,3,4,5,6,7}, global_counter=0;
+static atomic_t m = ATOMIC_INIT(0);
 
 static void lock(atomic_t *m)
 {
@@ -28,7 +29,9 @@ static int threadfn(void* data)
 	int i, local_counter, n=*(int*)data;
 
 	for (i = 0; i < 1000000; i++) {
+		lock(&m);
 		local_counter = ++global_counter;
+		unlock(&m);
 		// udelay(1);
 		// schedule();
 	}
