@@ -28,12 +28,11 @@ static int threadfn(void* data)
 {
 	int i, local_counter, n=*(int*)data;
 
-	for (i = 0; i < 1000000; i++) {
+	for (i = 0; i < 1000000000; i++) {
 		lock(&m);
 		local_counter = ++global_counter;
 		unlock(&m);
-		// udelay(1);
-		// schedule();
+		// ndelay(1);
 	}
 
 	pr_info("threadfn %d exited after %d: %d(%d)\n", n, i, local_counter, global_counter);
