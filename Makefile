@@ -1,6 +1,6 @@
 ifneq ($(KERNELRELEASE),)
 # kbuild part of makefile
-obj-m  := test_threads.o test_threads_locked.o
+obj-m  := test_threads.o test_threads_locked.o rw_threads.o
 else
 # normal makefile
 KDIR ?= /home/ilaptiev/training/kernel/linux-stable
