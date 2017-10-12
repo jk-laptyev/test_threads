@@ -26,10 +26,6 @@ static int threadfn(void* data)
 		while (1) {
 			i++;
 			down_read(&sem);
-			if (global_counter > 999) {
-				up_read(&sem);
-				break;
-			}
 			if (local_counter == global_counter) {
 				consecutive_locks++;
 				// pr_info("%d: consecutive read locks!\n", n);
@@ -40,12 +36,17 @@ static int threadfn(void* data)
 			ndelay(10);
 			if (local_counter != global_counter) {
 				local_counter = global_counter;
-				pr_alert("%d: read lock was interrupted with write!!!\n", n);
+				pr_alert("%d: read lock was interrupted with write!\n", n);
+			}
+			if (global_counter > 999) {
+				up_read(&sem);
+				break;
 			}
 			up_read(&sem);
 		}
 		((struct rw_thread *)data)->locks = locks; //unique reads
-		pr_info("%d: finished %d iterations\n\tuniq.locks %d, dupl. locks %d) reads\n", n, i, locks);
+		pr_info("%d: finished %d iterations\n\tuniq.locks %d, dupl. locks %d) reads\n",
+			n, i, locks, consecutive_locks);
 	} else { //write thread
 		for (i=0; i<1000; i++) {
 			down_write(&sem);
@@ -55,7 +56,7 @@ static int threadfn(void* data)
 			ndelay(10);
 		}
 		((struct rw_thread *)data)->locks = locks; //unique reads
-		pr_info("%d: finished 1000 (%d) writes\n", n, locks);
+		pr_info("%d: finished %d iterations, %d writes\n", n, i, locks);
 	}
 
 	// pr_info("threadfn %d exited after %d: %d(%d)\n", n, i, local_counter, global_counter);
